@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TISKA — JIK Sumatera Barat</title>
+<meta name="description" content="Pusat link kerja dan kontak penting Jaringan Intra Kementerian Sumatera Barat.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="split-mode">
+
+<div class="grid-backdrop" aria-hidden="true"></div>
+
+<header class="site-header">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <div class="brand-text">
+  <h1>TISKA JIK <span class="brand-highlight">SUMBAR</span></h1>
+  <p>Titik Saluran Kerja &middot; Jaringan Intra Kementerian &middot; Sumatera Barat</p>
+</div>
+</header>
+
+<!-- app-main selalu dalam mode "layout-split": menu-grid jadi sidebar
+     tetap di kiri, content-panel mengisi sisa ruang di kanan, sejak
+     halaman pertama dibuka (bukan cuma setelah sebuah menu diklik). -->
+<main id="app-main" class="layout-split">
+  <section id="menu-grid" class="menu-grid" aria-live="polite">
+    <!-- Section & tombol menu dirender di sini oleh js/index.js, diambil dari Supabase -->
+    <div class="menu-loading">Memuat menu&hellip;</div>
+  </section>
+
+  <section id="content-panel" class="content-panel">
+    <div class="content-panel-inner">
+      <div class="panel-topbar">
+        <p class="panel-session" id="panel-session" hidden></p>
+        <button type="button" id="content-logout" class="panel-logout" hidden>Logout</button>
+      </div>
+      <button type="button" id="content-close" class="panel-close" aria-label="Tutup" hidden>&times;</button>
+      <p class="panel-eyebrow" id="content-menu-name">&nbsp;</p>
+      <div id="content-body" class="content-body"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <p>TISKA JIK SUMBAR v1.0 &mdash; data dikelola sepenuhnya melalui Supabase.</p>
+</footer>
+
+<!-- Modal password -->
+<div id="auth-modal" class="auth-modal" hidden>
+  <div class="auth-modal-backdrop" id="auth-modal-backdrop"></div>
+  <form id="auth-form" class="auth-panel" autocomplete="off">
+    <p class="auth-target">Masuk ke <strong id="auth-menu-name">&mdash;</strong></p>
+    <label for="auth-username">Username</label>
+    <input type="text" id="auth-username" name="username" required autocomplete="username" placeholder="mis. bgtk">
+    <label for="auth-password" class="auth-label-spaced">Password</label>
+    <input type="password" id="auth-password" name="password" required autocomplete="current-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
+    <p class="auth-error" id="auth-error" role="alert" hidden></p>
+    <div class="auth-actions">
+      <button type="button" id="auth-cancel" class="btn btn-ghost">Batal</button>
+      <button type="submit" id="auth-submit" class="btn btn-primary">Buka</button>
+    </div>
+  </form>
+</div>
+
+<script type="module" src="js/supabase.js"></script>
+<script type="module" src="js/auth.js"></script>
+<script type="module" src="js/index.js"></script>
+</body>
+</html>

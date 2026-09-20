@@ -1,0 +1,883 @@
+/* ============================================================
+   TISKA JIK SUMBAR — style.css
+   Palet & tipografi: lihat catatan desain di README.md
+   ============================================================ */
+
+:root {
+  --ink:        #12181F;
+  --panel:      #1B232C;
+  --panel-2:    #212B35;
+  --line:       #2A343F;
+  --text:       #E7ECEF;
+  --text-muted: #8B98A5;
+  --amber:      #E8A33D;
+  --amber-dim:  #7A5A26;
+  --green:      #4C9A6A;
+  --red:        #C4574B;
+
+  --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--ink);
+  color: var(--text);
+  font-family: var(--font-sans);
+  min-height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Latar belakang: garis grid halus, mengingatkan pada diagram jaringan */
+.grid-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  opacity: 0.12;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 100%);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+/* ---------------- Header ---------------- */
+
+.site-header {
+  position: relative;
+  z-index: 1;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 56px 24px 28px;
+  width: 100%;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-mark {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 0 3px rgba(232, 163, 61, 0.18);
+  flex-shrink: 0;
+}
+
+.brand-text h1 {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin: 0;
+  line-height: 1;
+}
+
+.brand-highlight {
+  color: var(--amber);
+}
+
+.brand-text p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.brand-sub {
+  margin: 20px 0 0;
+  font-size: 16px;
+  color: var(--text-muted);
+  max-width: 52ch;
+  line-height: 1.5;
+}
+
+/* ---------------- Menu grid ---------------- */
+
+main {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+.menu-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.menu-section-title {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: var(--amber);
+  text-transform: uppercase;
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.menu-section-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 12px;
+}
+
+/* Saat sebuah menu berhasil dibuka: grid menu jadi daftar sempit di kiri,
+   panel konten mengisi sisa ruang di kanan. */
+main.layout-split {
+  max-width: 1080px;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+/* Sidebar tampil sebagai satu kartu navigasi bulat, mirip panel nav
+   aplikasi (ikon + label per baris, item aktif jadi pil terang). */
+main.layout-split .menu-grid {
+  width: 220px;
+  flex-shrink: 0;
+  gap: 22px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px 12px;
+}
+
+main.layout-split .menu-section-title {
+  font-size: 10.5px;
+  margin: 0 8px 6px;
+  padding-bottom: 0;
+  border-bottom: none;
+  opacity: 0.75;
+}
+
+/* Section dropdown (TAHUN, UMUM, dst): <summary> dipakai sebagai judul
+   yang bisa diklik untuk buka/tutup, dengan panah kecil di kanan yang
+   berputar mengikuti status buka/tutupnya. */
+.menu-section-dropdown > summary.menu-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.menu-section-dropdown > summary.menu-section-title::-webkit-details-marker {
+  display: none;
+}
+
+.menu-section-dropdown > summary.menu-section-title::after {
+  content: "";
+  margin-left: auto;
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid var(--text-muted);
+  border-bottom: 1.5px solid var(--text-muted);
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+}
+
+.menu-section-dropdown[open] > summary.menu-section-title::after {
+  transform: rotate(-135deg);
+}
+
+.menu-section-dropdown > .menu-section-items {
+  margin-top: 6px;
+}
+
+main.layout-split .menu-section-items {
+  grid-template-columns: 1fr;
+  gap: 3px;
+}
+
+main.layout-split .menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 11px;
+  background: transparent;
+  animation: none;
+  opacity: 1;
+}
+
+main.layout-split .menu-btn:hover, main.layout-split .menu-btn:focus-visible {
+  background: var(--panel-2);
+  border: none;
+}
+
+main.layout-split .menu-btn.is-active {
+  background: var(--amber);
+  border: none;
+}
+
+main.layout-split .menu-btn.is-active .menu-btn-name {
+  color: #1a1305;
+  font-weight: 600;
+}
+
+main.layout-split .menu-btn.is-active .menu-btn-icon {
+  background: rgba(26, 19, 5, 0.16);
+  color: #1a1305;
+}
+
+main.layout-split .menu-btn-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--panel-2);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+main.layout-split .menu-btn-name {
+  font-size: 14px;
+}
+
+main.layout-split .content-panel {
+  flex: 1;
+  margin-top: 0;
+  min-width: 0;
+  border-radius: 18px;
+}
+
+/* ---- App-shell mode: sidebar diam total, hanya panel konten yang scroll ----
+   Dipasang lewat class body.split-mode (js/auth.js). Body dikunci ke tinggi
+   viewport, footer disembunyikan, dan di dalam main baris sidebar+konten
+   sama-sama mengisi tinggi 100% — sidebar overflow sendiri kalau menunya
+   banyak, panel konten overflow sendiri untuk daftar link yang panjang. */
+body.split-mode {
+  height: 100vh;
+  overflow: hidden;
+}
+
+body.split-mode .site-footer {
+  display: none;
+}
+
+/* Header dikecilkan drastis di mode ini — supaya sidebar dapat ruang
+   vertikal maksimal dan semua menu muat tanpa scroll internal. */
+body.split-mode .site-header {
+  padding: 16px 24px 14px;
+  max-width: 1080px;
+}
+
+body.split-mode .brand-text h1 {
+  font-size: 18px;
+}
+
+body.split-mode .brand-sub {
+  display: none;
+}
+
+body.split-mode main.layout-split {
+  min-height: 0;
+  padding-bottom: 16px;
+  align-items: stretch;
+}
+
+body.split-mode main.layout-split .menu-grid {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-width: thin;
+}
+
+/* Judul section (INSTANSI, TAHUN, dst) menempel di atas sidebar selama
+   di-scroll, lalu digantikan judul section berikutnya saat section itu
+   sampai ke atas. Background solid supaya menutupi item yang lewat di
+   bawahnya. */
+body.split-mode main.layout-split .menu-section-title {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--panel);
+  padding-top: 4px;
+}
+
+body.split-mode main.layout-split .menu-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+body.split-mode main.layout-split .menu-grid::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: 3px;
+}
+
+body.split-mode main.layout-split .content-panel {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+@media (max-width: 720px) {
+  main.layout-split {
+    flex-direction: column;
+  }
+  main.layout-split .menu-grid {
+    width: 100%;
+  }
+  main.layout-split .menu-section-items {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  /* Di HP, app-shell dimatikan lagi — kembali ke scroll halaman biasa,
+     sidebar jadi grid horizontal normal di atas konten. */
+  body.split-mode {
+    height: auto;
+    overflow: visible;
+  }
+  body.split-mode .site-footer {
+    display: block;
+  }
+  body.split-mode main.layout-split {
+    height: auto;
+  }
+  body.split-mode main.layout-split .menu-grid {
+    height: auto;
+    overflow-y: visible;
+  }
+  body.split-mode main.layout-split .content-panel {
+    height: auto;
+    overflow-y: visible;
+  }
+}
+
+.menu-loading, .menu-empty {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  padding: 24px 0;
+}
+
+.menu-btn {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 20px 18px 16px;
+  text-align: left;
+  color: var(--text);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+  opacity: 0;
+  animation: menu-in 0.4s ease forwards;
+}
+
+.menu-btn:hover, .menu-btn:focus-visible {
+  border-color: var(--amber-dim);
+  background: var(--panel-2);
+  outline: none;
+}
+
+.menu-btn:focus-visible {
+  border-color: var(--amber);
+}
+
+.menu-btn.is-active {
+  border-color: var(--amber);
+  background: var(--panel-2);
+}
+
+.menu-btn.is-active .menu-btn-indicator {
+  background: var(--amber);
+  box-shadow: 0 0 0 3px rgba(232, 163, 61, 0.18);
+}
+
+.menu-btn-indicator {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.menu-btn-name {
+  display: block;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+@keyframes menu-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Stagger halus, satu momen di awal saja — per section */
+.menu-section-items .menu-btn:nth-child(1) { animation-delay: 0.02s; }
+.menu-section-items .menu-btn:nth-child(2) { animation-delay: 0.06s; }
+.menu-section-items .menu-btn:nth-child(3) { animation-delay: 0.10s; }
+.menu-section-items .menu-btn:nth-child(4) { animation-delay: 0.14s; }
+.menu-section-items .menu-btn:nth-child(5) { animation-delay: 0.18s; }
+.menu-section-items .menu-btn:nth-child(6) { animation-delay: 0.22s; }
+.menu-section-items .menu-btn:nth-child(7) { animation-delay: 0.26s; }
+.menu-section-items .menu-btn:nth-child(n+8) { animation-delay: 0.30s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-btn { animation: none; opacity: 1; }
+}
+
+/* ---------------- Content panel ---------------- */
+
+.content-panel {
+  margin-top: 28px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--panel);
+  animation: panel-in 0.28s ease;
+}
+
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.content-panel-inner {
+  position: relative;
+  padding: 24px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.panel-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 4px;
+  padding-right: 32px;
+}
+
+.panel-session {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+  margin-right: auto;
+}
+
+.panel-logout {
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 3px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.panel-logout:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.panel-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 22px;
+  line-height: 1;
+  padding: 4px 8px;
+}
+
+.panel-close:hover { color: var(--text); }
+
+.panel-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--amber);
+  margin: 0 0 16px;
+  padding-right: 32px;
+}
+
+.content-body { display: flex; flex-direction: column; gap: 2px; }
+
+/* Saat isinya cuma placeholder kosong (belum ada menu dipilih), blok ini
+   dipusatkan vertikal di sisa ruang panel. Saat berisi daftar link/kontak
+   sungguhan, aturan ini tidak berlaku (tidak match :has), jadi daftarnya
+   tetap rata atas seperti biasa. */
+.content-body:has(.panel-empty-state) {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.link-row, .contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 4px;
+  border-bottom: 1px solid var(--line);
+  text-decoration: none;
+  color: var(--text);
+}
+
+.link-row:last-child, .contact-row:last-child { border-bottom: none; }
+
+.link-row:hover { background: var(--panel-2); }
+
+.link-name, .contact-name { font-size: 15px; font-weight: 500; }
+
+.link-desc, .contact-position {
+  display: block;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.link-url, .contact-phone {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.panel-message {
+  font-size: 14px;
+  color: var(--text-muted);
+  padding: 8px 4px;
+}
+
+.panel-message.is-error { color: var(--red); }
+
+/* ---- Empty state panel kanan (belum ada menu dipilih) ---- */
+
+.panel-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  padding: 32px 20px;
+  color: var(--text-muted);
+}
+
+/* Ilustrasi empty-state: Jam Gadang, rumah gadang, dan Masjid Raya
+   Sumatera Barat berdiri sejajar di satu garis tanah
+   (.panel-empty-scene membungkus siluet + garisnya).
+
+   Ketiga PNG-nya line-art dengan latar transparan, dipakai sebagai CSS
+   mask — jadi warna garisnya diatur lewat background-color di .pe-art,
+   bukan oleh warna asli gambar.
+
+   PENTING — path url() relatif terhadap FILE CSS INI, bukan index.html.
+   "../jam-gadang.png" = satu tingkat naik dari css/, yaitu root project
+   (sejajar index.html). Kalau PNG-nya dipindah ke assets/, ubah jadi
+   "../assets/jam-gadang.png" dst. untuk ketiga url() di bawah. */
+.panel-empty-scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0.5;
+  animation: pe-breathe 5s ease-in-out infinite;
+}
+
+.panel-empty-skyline {
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  width: 100%;
+  max-width: 480px;
+}
+
+.panel-empty-ground {
+  width: 560px;
+  max-width: 74%;
+  height: 5px;
+  margin-top: 2px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--line) 12%,
+    var(--line) 88%,
+    transparent
+  );
+}
+
+.pe-art {
+  display: block;
+  /* Abu-abu netral sebagai fallback; browser yang mendukung
+     color-mix() (semua browser modern) menimpanya dengan tint
+     emas tipis supaya terasa lebih "Minang" tanpa jadi ramai. */
+  background-color: var(--text-muted);
+  background-color: color-mix(in srgb, var(--amber) 38%, var(--text-muted));
+  -webkit-mask-repeat: no-repeat;
+          mask-repeat: no-repeat;
+  -webkit-mask-position: center bottom;
+          mask-position: center bottom;
+  -webkit-mask-size: contain;
+          mask-size: contain;
+}
+
+/* Rasio tiap elemen dikunci lewat aspect-ratio supaya tingginya ikut
+   lebarnya sendiri; cukup ubah width untuk menyetel skala relatifnya. */
+.pe-art-jam {
+  width: 68px;
+  aspect-ratio: 300 / 565;
+  -webkit-mask-image: url("../jam-gadang.png");
+          mask-image: url("../jam-gadang.png");
+}
+
+.pe-art-rumah {
+  width: 220px;
+  aspect-ratio: 640 / 355;
+  -webkit-mask-image: url("../rumah-gadang.png");
+          mask-image: url("../rumah-gadang.png");
+  transform: translateX(0px); /* negatif = geser kiri, positif = geser kanan */
+}
+
+.pe-art-masjid {
+  width: 150px;
+  aspect-ratio: 500 / 393;
+  -webkit-mask-image: url("../masjid-raya.png");
+          mask-image: url("../masjid-raya.png");
+}
+
+@keyframes pe-breathe {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 0.36; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-empty-scene { animation: none; }
+}
+
+/* Browser lama tanpa dukungan CSS mask: tampilkan garisnya apa adanya
+   (PNG-nya sudah putih transparan, jadi tetap terbaca di latar gelap). */
+@supports not ((-webkit-mask-image: url("")) or (mask-image: url(""))) {
+  .pe-art-jam    { background: url("../jam-gadang.png")    no-repeat center bottom / contain; }
+  .pe-art-rumah  { background: url("../rumah-gadang.png")  no-repeat center bottom / contain; }
+  .pe-art-masjid { background: url("../masjid-raya.png")   no-repeat center bottom / contain; }
+}
+
+.panel-empty-title {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: 1.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.panel-empty-text {
+  font-size: 14px;
+  margin: 0;
+  max-width: 32ch;
+}
+
+.panel-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text-muted);
+  padding: 8px 4px;
+}
+
+.panel-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--line);
+  border-top-color: var(--amber);
+  border-radius: 50%;
+  animation: panel-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes panel-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-spinner { animation: none; }
+}
+
+/* ---------------- Auth modal ---------------- */
+
+.auth-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* Kelas .auth-modal di atas set display:flex, yang menang atas aturan
+   default browser untuk [hidden]. Harus dinyatakan ulang secara eksplisit
+   di sini, jika tidak modal akan selalu tampil walau atribut hidden ada. */
+.auth-modal[hidden] {
+  display: none;
+}
+
+.auth-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(9, 12, 16, 0.65);
+}
+
+.auth-panel {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  padding: 24px 24px 28px;
+  margin: 0 16px;
+  animation: sheet-up 0.22s ease;
+}
+
+@media (min-width: 480px) {
+  .auth-modal { align-items: center; }
+  .auth-panel { border-bottom: 1px solid var(--line); border-radius: 8px; animation: sheet-in 0.2s ease; }
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes sheet-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.auth-target {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0 0 18px;
+}
+
+.auth-target strong { color: var(--text); font-weight: 500; }
+
+.auth-panel label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.auth-panel label.auth-label-spaced {
+  margin-top: 16px;
+}
+
+.auth-panel input {
+  width: 100%;
+  background: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  letter-spacing: 2px;
+  padding: 12px 14px;
+  outline: none;
+}
+
+.auth-panel input:focus {
+  border-color: var(--amber);
+}
+
+.auth-error {
+  color: var(--red);
+  font-size: 13px;
+  margin: 12px 0 0;
+}
+
+.auth-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  padding: 10px 18px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-ghost:hover { border-color: var(--text-muted); }
+
+.btn-primary {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: #1a1305;
+  font-weight: 500;
+}
+
+.btn-primary:hover { background: #f0b155; }
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ---------------- Footer ---------------- */
+
+.site-footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 24px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ---------------- Focus visibility (accessibility floor) ---------------- */
+
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
