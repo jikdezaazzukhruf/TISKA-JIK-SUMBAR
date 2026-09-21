@@ -65,10 +65,9 @@ a {
 .site-header {
   position: relative;
   z-index: 1;
-  max-width: 880px;
+  width: min(94%, 960px);
   margin: 0 auto;
   padding: 56px 24px 28px;
-  width: 100%;
 }
 
 .brand {
@@ -121,8 +120,7 @@ main {
   z-index: 1;
   flex: 1;
   min-height: 0;
-  width: 100%;
-  max-width: 880px;
+  width: min(94%, 960px);
   margin: 0 auto;
   padding: 0 24px 48px;
 }
@@ -154,7 +152,7 @@ main {
 /* Saat sebuah menu berhasil dibuka: grid menu jadi daftar sempit di kiri,
    panel konten mengisi sisa ruang di kanan. */
 main.layout-split {
-  max-width: 1080px;
+  width: min(96%, 1240px);
   display: flex;
   align-items: flex-start;
   gap: 20px;
@@ -296,7 +294,7 @@ body.split-mode .site-footer {
    vertikal maksimal dan semua menu muat tanpa scroll internal. */
 body.split-mode .site-header {
   padding: 16px 24px 14px;
-  max-width: 1080px;
+  width: min(96%, 1240px);
 }
 
 body.split-mode .brand-text h1 {
@@ -356,7 +354,8 @@ body.split-mode main.layout-split .content-panel {
     width: 100%;
   }
   main.layout-split .menu-section-items {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 
   /* Di HP, app-shell dimatikan lagi — kembali ke scroll halaman biasa,
@@ -379,6 +378,46 @@ body.split-mode main.layout-split .content-panel {
     height: auto;
     overflow-y: visible;
   }
+
+  /* ---- Kenyamanan sentuh khusus mobile ---- */
+
+  /* Area klik judul section (dropdown) dibesarkan jadi baris penuh,
+     bukan cuma setinggi teksnya saja. */
+  main.layout-split .menu-section-title {
+    padding: 12px 10px;
+    margin: 0;
+    font-size: 12px;
+  }
+  main.layout-split .menu-grid {
+    gap: 6px;
+    padding: 10px;
+  }
+
+  /* Baris link/kontak & tombol dibesarkan area sentuhnya */
+  .link-row, .contact-row {
+    padding: 15px 4px;
+  }
+  .btn {
+    padding: 13px 20px;
+    font-size: 15px;
+  }
+  .auth-actions {
+    gap: 12px;
+  }
+  .content-panel-inner {
+    padding: 18px 16px 20px;
+  }
+}
+
+/* Hilangkan kilat abu-abu bawaan browser saat elemen disentuh di HP,
+   supaya terasa lebih halus/native. */
+.menu-btn,
+.link-row,
+.contact-row,
+.btn,
+.panel-close,
+.panel-logout {
+  -webkit-tap-highlight-color: transparent;
 }
 
 .menu-loading, .menu-empty {
@@ -814,9 +853,9 @@ body.split-mode main.layout-split .content-panel {
   border-radius: 4px;
   color: var(--text);
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: 16px; /* >=16px wajib -> mencegah auto-zoom Safari/Chrome mobile saat fokus */
   letter-spacing: 2px;
-  padding: 12px 14px;
+  padding: 13px 14px;
   outline: none;
 }
 
