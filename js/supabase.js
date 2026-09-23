@@ -13,6 +13,8 @@ export const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 
 export const EDGE_FUNCTION_URL = "https://qpurcpdkqrnwmieppylg.supabase.co/functions/v1/verify-access";
 
+export const ADMIN_FUNCTION_URL = "https://qpurcpdkqrnwmieppylg.supabase.co/functions/v1/admin-manage";
+
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Helper untuk memanggil Edge Function verify-access
@@ -27,4 +29,23 @@ export async function callVerifyAccess(payload) {
   });
   const data = await res.json().catch(() => ({}));
   return { ok: res.ok, status: res.status, data };
+}
+
+// Helper untuk memanggil Edge Function admin-manage (dipakai admin.html)
+export async function callAdminManage(payload) {
+  try {
+    const res = await fetch(ADMIN_FUNCTION_URL, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "authorization": `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json().catch(() => ({}));
+    return { ok: res.ok, status: res.status, data };
+  } catch (err) {
+    console.error("callAdminManage network error:", err);
+    return { ok: false, status: 0, data: { error: "network_error" } };
+  }
 }

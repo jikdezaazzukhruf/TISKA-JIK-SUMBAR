@@ -95,11 +95,22 @@ Pilih folder ini sebagai root. Tidak perlu build step — ini static site murni.
 
 ## Menambah menu/link/kontak baru (tanpa coding)
 
-Semua lewat **Table Editor** di dashboard Supabase:
-- Menu baru → tambah row di `menus`
-- Link baru → tambah row di `links`, isi `menu_id` yang sesuai
-- Kontak baru → tambah row di `contacts`, isi `menu_id` yang sesuai
-- Beri akses ke profile → tambah row di `access_permissions`
+Dua cara:
+1. **Halaman admin** (`/admin.html`) — login dengan akun ber-role `admin`. Ada
+   4 tab: Menu, Link & Kontak, Profile, Permission. Cara paling praktis untuk
+   pekerjaan sehari-hari, tidak perlu buka dashboard Supabase sama sekali.
+2. **Table Editor Supabase langsung** — tetap bisa dipakai kapan saja
+   (Menu baru → tabel `menus`, Link → `links`, Kontak → `contacts`, Akses →
+   `access_permissions`).
+
+## Otomatisasi menu TAHUN
+
+Menu bertipe `tahun` untuk tahun berjalan dibuat otomatis oleh `pg_cron`
+(jadwal harian jam 01:00 UTC, fungsi `tiska_ensure_tahun_menu()`) — begitu
+tahun baru mulai, menu tahun itu langsung muncul di homepage tanpa perlu
+disentuh manual. Permission-nya otomatis diberikan ke semua profile aktif,
+sama seperti pola tahun-tahun sebelumnya. Isinya (link) tetap perlu diisi
+manual lewat admin panel atau Table Editor.
 
 ## Keamanan yang sudah diterapkan
 
@@ -114,8 +125,17 @@ Semua lewat **Table Editor** di dashboard Supabase:
 - Setiap permintaan isi menu selalu dicek ulang permission-nya di server —
   tidak pernah "ambil semua lalu sembunyikan di frontend".
 
-**Catatan:** rate-limiting per IP (`login_attempts`) sengaja dilepas atas
-permintaan — tidak ada lagi batas jumlah percobaan login. Cocok untuk tim
-kecil yang saling percaya; kalau nanti butuh lagi, tinggal tambahkan
-tabel serupa dan cek jumlah percobaan gagal di Edge Function sebelum
-`bcrypt.compare`.
+**Catatan:** rate-limiting sekarang berbasis **username** (bukan IP) — 5x
+gagal login dalam 15 menit untuk username yang sama akan diblokir sementara,
+pesannya menyebutkan sisa waktu tunggu.
+
+## Halaman admin (`/admin.html`)
+
+Backend terpisah lewat Edge Function `admin-manage` — **role admin dicek
+ulang di server di setiap aksi**, bukan cuma saat login. Jadi token dari
+login di situs utama (`verify-access`) tidak bisa dipakai untuk mengelola
+data di sini walau kebetulan sama-sama valid, karena token tidak menyimpan
+role — role-nya selalu dicek ulang ke database per request.
+
+Login admin terpisah dari sesi situs utama (key sessionStorage beda), jadi
+buka dua tab (situs utama + admin) di browser yang sama tidak akan bentrok.

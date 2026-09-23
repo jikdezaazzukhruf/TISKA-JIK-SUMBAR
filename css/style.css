@@ -325,7 +325,7 @@ body.split-mode main.layout-split .menu-grid {
    bawahnya. */
 body.split-mode main.layout-split .menu-section-title {
   position: sticky;
-  top: 0;
+  top: 42px; /* geser ke bawah kotak pencarian (juga sticky, top:0) supaya tidak tumpuk */
   z-index: 1;
   background: var(--panel);
   padding-top: 4px;
@@ -349,8 +349,12 @@ body.split-mode main.layout-split .content-panel {
 @media (max-width: 720px) {
   main.layout-split {
     flex-direction: column;
+    align-items: stretch;
   }
   main.layout-split .menu-grid {
+    width: 100%;
+  }
+  main.layout-split .content-panel {
     width: 100%;
   }
   main.layout-split .menu-section-items {
@@ -612,7 +616,64 @@ body.split-mode main.layout-split .content-panel {
   font-size: 12.5px;
   color: var(--text-muted);
   white-space: nowrap;
+  text-decoration: none;
 }
+
+.contact-phone:hover { color: var(--amber); text-decoration: underline; }
+
+.row-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.copy-btn {
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--text-muted);
+  font-size: 13px;
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.copy-btn:hover { border-color: var(--amber-dim); color: var(--text); }
+
+.copy-btn.is-copied {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+/* ---- Kotak pencarian menu ---- */
+
+.menu-search-wrap {
+  margin-bottom: 14px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--panel);
+}
+
+.menu-search-input {
+  width: 100%;
+  background: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: 9px 12px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.menu-search-input:focus { border-color: var(--amber); }
 
 .panel-message {
   font-size: 14px;

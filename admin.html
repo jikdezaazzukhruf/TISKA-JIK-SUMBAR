@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — TISKA JIK SUMBAR</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+
+<div class="grid-backdrop" aria-hidden="true"></div>
+
+<!-- ======================= LOGIN ======================= -->
+<div id="admin-login" class="admin-login">
+  <form id="admin-login-form" class="auth-panel admin-login-panel">
+    <p class="admin-login-title">TISKA <span class="brand-highlight">Admin</span></p>
+    <label for="admin-username">Username</label>
+    <input type="text" id="admin-username" autocomplete="username" required>
+    <label for="admin-password">Password</label>
+    <input type="password" id="admin-password" autocomplete="current-password" required>
+    <p class="auth-error" id="admin-login-error" role="alert" hidden></p>
+    <button type="submit" class="btn btn-primary admin-login-btn" id="admin-login-btn">Masuk</button>
+    <a href="index.html" class="admin-back-link">&larr; Kembali ke situs utama</a>
+  </form>
+</div>
+
+<!-- ======================= APP ADMIN ======================= -->
+<div id="admin-app" class="admin-app" hidden>
+  <header class="admin-header">
+    <p class="admin-header-title">TISKA <span class="brand-highlight">Admin</span></p>
+    <div class="admin-header-right">
+      <span id="admin-whoami" class="admin-whoami"></span>
+      <button type="button" id="admin-logout" class="btn btn-ghost">Logout</button>
+    </div>
+  </header>
+
+  <nav class="admin-tabs" id="admin-tabs">
+    <button type="button" class="admin-tab is-active" data-tab="menus">Menu</button>
+    <button type="button" class="admin-tab" data-tab="content">Link &amp; Kontak</button>
+    <button type="button" class="admin-tab" data-tab="profiles">Profile</button>
+    <button type="button" class="admin-tab" data-tab="permissions">Permission</button>
+  </nav>
+
+  <main class="admin-main">
+
+    <!-- ---------------- TAB: MENUS ---------------- -->
+    <section id="tab-menus" class="admin-tab-panel is-active">
+      <div class="admin-panel-head">
+        <h2>Menu</h2>
+        <button type="button" class="btn btn-primary" id="menu-add-btn">+ Menu baru</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="menus-table">
+          <thead>
+            <tr><th>Nama</th><th>Tipe</th><th>Isi</th><th>Status</th><th>Urutan</th><th></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------------- TAB: LINKS & CONTACTS ---------------- -->
+    <section id="tab-content" class="admin-tab-panel">
+      <div class="admin-panel-head">
+        <h2>Link &amp; Kontak</h2>
+        <select id="content-menu-select" class="admin-select"></select>
+        <button type="button" class="btn btn-primary" id="content-add-btn">+ Tambah</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="content-table">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------------- TAB: PROFILES ---------------- -->
+    <section id="tab-profiles" class="admin-tab-panel">
+      <div class="admin-panel-head">
+        <h2>Profile / Akun</h2>
+        <button type="button" class="btn btn-primary" id="profile-add-btn">+ Profile baru</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="profiles-table">
+          <thead>
+            <tr><th>Nama</th><th>Username</th><th>Role</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------------- TAB: PERMISSIONS ---------------- -->
+    <section id="tab-permissions" class="admin-tab-panel">
+      <div class="admin-panel-head">
+        <h2>Permission</h2>
+        <p class="admin-panel-hint">Centang = profile itu boleh buka menu itu.</p>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table admin-matrix" id="permissions-table"></table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ======================= MODAL FORM (dipakai ulang utk menu/link/kontak/profile) ======================= -->
+<div id="admin-modal" class="auth-modal" hidden>
+  <div class="auth-modal-backdrop" id="admin-modal-backdrop"></div>
+  <form id="admin-modal-form" class="auth-panel admin-modal-panel">
+    <p class="auth-target" id="admin-modal-title">&mdash;</p>
+    <div id="admin-modal-fields" class="admin-modal-fields"></div>
+    <p class="auth-error" id="admin-modal-error" role="alert" hidden></p>
+    <div class="auth-actions">
+      <button type="button" id="admin-modal-cancel" class="btn btn-ghost">Batal</button>
+      <button type="submit" class="btn btn-primary">Simpan</button>
+    </div>
+  </form>
+</div>
+
+<script type="module" src="js/supabase.js"></script>
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>

@@ -55,7 +55,7 @@ function resetPanel() {
       <div class="panel-empty-ground" aria-hidden="true"></div>
     </div>
     <p class="panel-empty-title">TISKA JIK SUMBAR</p>
-    <p class="panel-empty-text">Pilih menu di sebelah kiri untuk melihat konten.</p>
+    <p class="panel-empty-text">Pilih salah satu menu untuk melihat konten.</p>
   `;
   panelBody.appendChild(wrap);
 }
@@ -287,8 +287,14 @@ function buildLinkRow(link) {
     (link.description ? `<span class="link-desc">${escapeHtml(link.description)}</span>` : "");
 
   const right = document.createElement("span");
-  right.className = "link-url";
-  right.textContent = safeHost(link.url);
+  right.className = "row-right";
+
+  const urlText = document.createElement("span");
+  urlText.className = "link-url";
+  urlText.textContent = safeHost(link.url);
+
+  right.appendChild(urlText);
+  right.appendChild(buildCopyButton(link.url, "Salin URL"));
 
   a.appendChild(left);
   a.appendChild(right);
@@ -304,12 +310,71 @@ function buildContactRow(contact) {
     (contact.position ? `<span class="contact-position">${escapeHtml(contact.position)}</span>` : "");
 
   const right = document.createElement("span");
-  right.className = "contact-phone";
-  right.textContent = contact.phone;
+  right.className = "row-right";
+
+  const waLink = document.createElement("a");
+  waLink.className = "contact-phone";
+  waLink.href = `https://wa.me/${toWhatsAppNumber(contact.phone)}`;
+  waLink.target = "_blank";
+  waLink.rel = "noopener noreferrer";
+  waLink.title = "Buka chat WhatsApp";
+  waLink.textContent = contact.phone;
+
+  right.appendChild(waLink);
+  right.appendChild(buildCopyButton(contact.phone, "Salin nomor"));
 
   row.appendChild(left);
   row.appendChild(right);
   return row;
+}
+
+// Ubah nomor lokal (mis. "0812-3456-7890") jadi format wa.me (62812...).
+// Nomor yang sudah diawali 62 atau +62 dibiarkan, cuma dibersihkan dari
+// karakter non-digit.
+function toWhatsAppNumber(phone) {
+  const digits = String(phone || "").replace(/\D/g, "");
+  if (digits.startsWith("62")) return digits;
+  if (digits.startsWith("0")) return "62" + digits.slice(1);
+  return "62" + digits;
+}
+
+// Tombol salin kecil di sebelah URL/nomor telepon. Dipakai di dalam <a>
+// (link-row), jadi klik-nya WAJIB stopPropagation+preventDefault supaya
+// tidak ikut membuka link saat orang cuma mau menyalin.
+function buildCopyButton(text, label) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "copy-btn";
+  btn.title = label;
+  btn.setAttribute("aria-label", label);
+  btn.textContent = "\u29c9"; // simbol "salin" sederhana, tanpa perlu ikon font
+
+  btn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // Fallback untuk browser/konteks lama yang tidak dukung Clipboard API
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch {}
+      document.body.removeChild(ta);
+    }
+    const original = btn.textContent;
+    btn.textContent = "\u2713";
+    btn.classList.add("is-copied");
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.classList.remove("is-copied");
+    }, 1200);
+  });
+
+  return btn;
 }
 
 function safeHost(url) {

@@ -41,9 +41,38 @@ async function loadMenus() {
   }
 
   grid.innerHTML = "";
+  grid.appendChild(buildSearchBox());
 
   const grouped = groupBySection(menus);
   grouped.forEach(({ label, items, collapsible }) => grid.appendChild(buildSection(label, items, collapsible)));
+}
+
+// --------------------------------------------------------
+// Kotak pencarian di atas daftar menu. Filter berdasarkan nama menu,
+// section yang tidak ada hasilnya disembunyikan, dan dropdown yang
+// ada hasilnya otomatis terbuka selama pencarian aktif.
+// --------------------------------------------------------
+function buildSearchBox() {
+  const wrap = document.createElement("div");
+  wrap.className = "menu-search-wrap";
+  wrap.innerHTML = `<input type="search" id="menu-search" class="menu-search-input" placeholder="Cari menu\u2026" autocomplete="off">`;
+
+  const input = wrap.querySelector("#menu-search");
+  input.addEventListener("input", () => {
+    const q = input.value.trim().toLowerCase();
+    grid.querySelectorAll(".menu-section, .menu-section-dropdown").forEach((section) => {
+      let anyMatch = false;
+      section.querySelectorAll(".menu-btn").forEach((btn) => {
+        const match = !q || (btn.dataset.menuName || "").includes(q);
+        btn.style.display = match ? "" : "none";
+        if (match) anyMatch = true;
+      });
+      section.style.display = anyMatch ? "" : "none";
+      if (section.tagName === "DETAILS") section.open = q ? anyMatch : false;
+    });
+  });
+
+  return wrap;
 }
 
 function groupBySection(menus) {
@@ -120,6 +149,7 @@ function buildMenuButton(menu) {
   btn.type = "button";
   btn.className = "menu-btn";
   btn.dataset.menuId = menu.id;
+  btn.dataset.menuName = (menu.name || "").toLowerCase();
 
   btn.innerHTML = `
     <span class="menu-btn-icon" aria-hidden="true">${escapeHtml(menuInitial(menu.name))}</span>
