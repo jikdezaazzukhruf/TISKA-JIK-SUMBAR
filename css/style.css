@@ -981,3 +981,8 @@ body.split-mode main.layout-split .content-panel {
   outline: 2px solid var(--amber);
   outline-offset: 2px;
 }
+
+/* === SEMENTARA, HAPUS SETELAH SCREENSHOT === */
+main { outline: 2px solid red; }
+#menu-grid { outline: 2px solid lime; }
+.content-panel { outline: 2px solid cyan; }
