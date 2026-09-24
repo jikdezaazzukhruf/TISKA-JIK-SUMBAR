@@ -19,6 +19,14 @@
   padding: 24px;
 }
 
+/* Kelas di atas set display:flex, yang menang atas aturan default browser
+   untuk [hidden]. Harus dinyatakan ulang secara eksplisit, sama seperti
+   perbaikan .auth-modal[hidden] di style.css — kalau tidak, atribut hidden
+   yang diset lewat JS tidak berefek sama sekali. */
+.admin-login[hidden] {
+  display: none;
+}
+
 .admin-login-panel {
   position: static;
   animation: sheet-in 0.2s ease;
@@ -80,6 +88,10 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.admin-app[hidden] {
+  display: none;
 }
 
 .admin-header {

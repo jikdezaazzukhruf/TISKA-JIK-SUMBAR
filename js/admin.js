@@ -64,13 +64,20 @@ async function showApp(profile) {
   loginView.hidden = true;
   appView.hidden = false;
   whoamiEl.textContent = profile?.name || profile?.username || "";
-  await loadMenus();
-  await loadProfiles();
-  await loadPermissions();
-  renderMenusTable();
-  renderProfilesTable();
-  renderPermissionsMatrix();
-  populateContentMenuSelect();
+  try {
+    await loadMenus();
+    await loadProfiles();
+    await loadPermissions();
+    renderMenusTable();
+    renderProfilesTable();
+    renderPermissionsMatrix();
+    populateContentMenuSelect();
+  } catch (err) {
+    // Jangan biarkan satu bagian yang gagal bikin seluruh halaman admin
+    // diam-diam kosong tanpa penjelasan — tetap tampil + catat ke Console.
+    console.error("Gagal memuat sebagian data admin:", err);
+    alert("Sebagian data gagal dimuat. Buka Console (F12) untuk detail errornya, lalu coba muat ulang halaman.");
+  }
 }
 
 loginForm.addEventListener("submit", async (e) => {
