@@ -28,11 +28,19 @@ html, body {
   color: var(--text);
   font-family: var(--font-sans);
   min-height: 100%;
+  /* Pengaman: kalau ada elemen mana pun yang sedikit lebih lebar dari
+     layar (overflow horizontal tak kasat mata), ini mencegah seluruh
+     halaman ikut melebar dan bikin kesan "kartu geser ke kiri, ruang
+     kosong di kanan" di beberapa HP/browser tertentu. */
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 body {
   display: flex;
   flex-direction: column;
+  align-items: center; /* pemaksa tambahan: pusatkan header/main/footer,
+                           melapisi width+margin:auto masing-masing elemen */
   min-height: 100vh;
   position: relative;
 }
@@ -981,8 +989,3 @@ body.split-mode main.layout-split .content-panel {
   outline: 2px solid var(--amber);
   outline-offset: 2px;
 }
-
-/* === SEMENTARA, HAPUS SETELAH SCREENSHOT === */
-main { outline: 2px solid red; }
-#menu-grid { outline: 2px solid lime; }
-.content-panel { outline: 2px solid cyan; }
