@@ -261,6 +261,8 @@ function renderContent(menu, data) {
     panelBody.appendChild(msg);
   } else if (data.content_type === "contacts") {
     data.items.forEach((c) => panelBody.appendChild(buildContactRow(c)));
+  } else if (data.content_type === "address") {
+    data.items.forEach((a) => panelBody.appendChild(buildAddressRow(a)));
   } else {
     data.items.forEach((l) => panelBody.appendChild(buildLinkRow(l)));
   }
@@ -322,6 +324,37 @@ function buildContactRow(contact) {
 
   right.appendChild(waLink);
   right.appendChild(buildCopyButton(contact.phone, "Salin nomor"));
+
+  row.appendChild(left);
+  row.appendChild(right);
+  return row;
+}
+
+// Baris untuk tipe menu "address" — pakai tabel yang sama dengan kontak
+// (field 'phone' dipakai ulang untuk menyimpan teks alamat), TAPI tidak
+// dijadikan link WhatsApp. Malah jadi link buka Google Maps.
+function buildAddressRow(item) {
+  const row = document.createElement("div");
+  row.className = "contact-row";
+
+  const left = document.createElement("span");
+  left.innerHTML = `<span class="contact-name">${escapeHtml(item.name)}</span>` +
+    (item.position ? `<span class="contact-position">${escapeHtml(item.position)}</span>` : "") +
+    `<span class="link-desc">${escapeHtml(item.phone)}</span>`;
+
+  const right = document.createElement("span");
+  right.className = "row-right";
+
+  const mapsLink = document.createElement("a");
+  mapsLink.className = "contact-phone";
+  mapsLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.phone)}`;
+  mapsLink.target = "_blank";
+  mapsLink.rel = "noopener noreferrer";
+  mapsLink.title = "Buka di Google Maps";
+  mapsLink.textContent = "Peta";
+
+  right.appendChild(mapsLink);
+  right.appendChild(buildCopyButton(item.phone, "Salin alamat"));
 
   row.appendChild(left);
   row.appendChild(right);

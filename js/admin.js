@@ -237,7 +237,7 @@ function renderMenusTable() {
     tr.innerHTML = `
       <td>${escapeHtml(m.name)}</td>
       <td>${escapeHtml(m.type || "")}</td>
-      <td>${m.content_type === "contacts" ? "Kontak" : "Link"}</td>
+      <td>${contentTypeLabel(m.content_type)}</td>
       <td>${m.status === "active" ? "Aktif" : "Nonaktif"}</td>
       <td>${m.sort_order}</td>
     `;
@@ -249,13 +249,28 @@ function renderMenusTable() {
   });
 }
 
+// 'contacts' dan 'address' sama-sama disimpan di tabel `contacts` (field
+// phone dipakai ulang untuk teks alamat pada tipe 'address') — cuma beda
+// label & cara tampil di situs utama (kontak -> link WhatsApp, alamat ->
+// link Google Maps).
+function usesContactsTable(contentType) {
+  return contentType === "contacts" || contentType === "address";
+}
+
+function contentTypeLabel(contentType) {
+  if (contentType === "contacts") return "Kontak";
+  if (contentType === "address") return "Alamat";
+  return "Link";
+}
+
 function menuFieldsSpec() {
   return [
     { key: "name", label: "Nama menu", required: true },
     { key: "type", label: "Tipe (label section, mis. instansi/tahun/umum)" },
     { key: "content_type", label: "Isi menu", type: "select", options: [
       { value: "links", label: "Daftar link" },
-      { value: "contacts", label: "Daftar kontak" },
+      { value: "contacts", label: "Daftar kontak (No. HP/WA)" },
+      { value: "address", label: "Daftar alamat (buka di Maps)" },
     ] },
     { key: "status", label: "Status", type: "select", options: STATUS_OPTIONS },
     { key: "sort_order", label: "Urutan (angka)", type: "number" },
@@ -305,7 +320,7 @@ function populateContentMenuSelect() {
   state.menus.forEach((m) => {
     const o = document.createElement("option");
     o.value = m.id;
-    o.textContent = `${m.name} (${m.content_type === "contacts" ? "kontak" : "link"})`;
+    o.textContent = `${m.name} (${contentTypeLabel(m.content_type).toLowerCase()})`;
     contentMenuSelect.appendChild(o);
   });
   if (state.menus.length) {
@@ -327,7 +342,7 @@ function currentMenu() {
 async function loadAndRenderContent() {
   const menu = currentMenu();
   if (!menu) return;
-  const action = menu.content_type === "contacts" ? "list_contacts" : "list_links";
+  const action = usesContactsTable(menu.content_type) ? "list_contacts" : "list_links";
   const { ok, data } = await callAdminManage({ action, token: getToken(), menu_id: menu.id });
   const items = ok && data?.ok ? data.data || [] : [];
   renderContentTable(menu, items);
@@ -342,11 +357,13 @@ function linkFieldsSpec() {
     { key: "sort_order", label: "Urutan (angka)", type: "number" },
   ];
 }
-function contactFieldsSpec() {
+function contactFieldsSpec(contentType) {
+  const isAddress = contentType === "address";
   return [
     { key: "name", label: "Nama", required: true },
-    { key: "position", label: "Jabatan (opsional)" },
-    { key: "phone", label: "No. HP/WA", required: true, placeholder: "0812xxxxxxx" },
+    { key: "position", label: isAddress ? "Label (mis. Kantor Pusat) (opsional)" : "Jabatan (opsional)" },
+    { key: "phone", label: isAddress ? "Alamat lengkap" : "No. HP/WA",
+      required: true, placeholder: isAddress ? "Jl. Contoh No. 1, Kota, Provinsi" : "0812xxxxxxx" },
     { key: "description", label: "Catatan (opsional)" },
     { key: "status", label: "Status", type: "select", options: STATUS_OPTIONS },
     { key: "sort_order", label: "Urutan (angka)", type: "number" },
@@ -354,12 +371,13 @@ function contactFieldsSpec() {
 }
 
 function renderContentTable(menu, items) {
-  const isContacts = menu.content_type === "contacts";
+  const isContacts = usesContactsTable(menu.content_type);
+  const phoneColLabel = menu.content_type === "address" ? "Alamat" : "No. HP";
   const thead = document.querySelector("#content-table thead");
   const tbody = document.querySelector("#content-table tbody");
 
   thead.innerHTML = isContacts
-    ? "<tr><th>Nama</th><th>Jabatan</th><th>No. HP</th><th>Status</th><th>Urutan</th><th></th></tr>"
+    ? `<tr><th>Nama</th><th>Label</th><th>${phoneColLabel}</th><th>Status</th><th>Urutan</th><th></th></tr>`
     : "<tr><th>Nama</th><th>URL</th><th>Status</th><th>Urutan</th><th></th></tr>";
 
   tbody.innerHTML = "";
@@ -373,8 +391,8 @@ function renderContentTable(menu, items) {
          <td>${item.status === "active" ? "Aktif" : "Nonaktif"}</td><td>${item.sort_order}</td>`;
 
     const actionsTd = document.createElement("td");
-    actionsTd.appendChild(buildRowButton("Edit", () => editContentItem(menu, item, isContacts)));
-    actionsTd.appendChild(buildRowButton("Hapus", () => deleteContentItem(menu, item, isContacts), true));
+    actionsTd.appendChild(buildRowButton("Edit", () => editContentItem(menu, item)));
+    actionsTd.appendChild(buildRowButton("Hapus", () => deleteContentItem(menu, item), true));
     tr.appendChild(actionsTd);
     tbody.appendChild(tr);
   });
@@ -383,10 +401,10 @@ function renderContentTable(menu, items) {
 contentAddBtn.addEventListener("click", async () => {
   const menu = currentMenu();
   if (!menu) return alert("Buat menu dulu di tab Menu.");
-  const isContacts = menu.content_type === "contacts";
-  const spec = isContacts ? contactFieldsSpec() : linkFieldsSpec();
+  const isContacts = usesContactsTable(menu.content_type);
+  const spec = isContacts ? contactFieldsSpec(menu.content_type) : linkFieldsSpec();
   const values = await openModal(
-    `Tambah ${isContacts ? "kontak" : "link"} ke ${menu.name}`,
+    `Tambah ${contentTypeLabel(menu.content_type).toLowerCase()} ke ${menu.name}`,
     spec,
     { status: "active", sort_order: 1 }
   );
@@ -397,8 +415,9 @@ contentAddBtn.addEventListener("click", async () => {
   loadAndRenderContent();
 });
 
-async function editContentItem(menu, item, isContacts) {
-  const spec = isContacts ? contactFieldsSpec() : linkFieldsSpec();
+async function editContentItem(menu, item) {
+  const isContacts = usesContactsTable(menu.content_type);
+  const spec = isContacts ? contactFieldsSpec(menu.content_type) : linkFieldsSpec();
   const values = await openModal(`Edit: ${item.name}`, spec, item);
   if (!values) return;
   const action = isContacts ? "upsert_contact" : "upsert_link";
@@ -407,8 +426,9 @@ async function editContentItem(menu, item, isContacts) {
   loadAndRenderContent();
 }
 
-async function deleteContentItem(menu, item, isContacts) {
+async function deleteContentItem(menu, item) {
   if (!confirmDelete(item.name)) return;
+  const isContacts = usesContactsTable(menu.content_type);
   const action = isContacts ? "delete_contact" : "delete_link";
   const { ok, data } = await callAdminManage({ action, token: getToken(), id: item.id });
   if (!ok || !data?.ok) return notifyError(data, "Gagal menghapus.");
