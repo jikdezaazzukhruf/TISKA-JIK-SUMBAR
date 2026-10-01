@@ -12,15 +12,14 @@ import { tryOpenMenu } from "./auth.js";
 
 const grid = document.getElementById("menu-grid");
 
-// Urutan & label section. Kolom `menus.type` yang menentukan section-nya.
-// Type yang tidak ada di daftar ini otomatis masuk ke "LAINNYA" di akhir.
-// "collapsible: true" -> section dirender sebagai dropdown (<details>)
-// yang bisa dibuka/tutup, cocok untuk section yang isinya bisa banyak.
-const SECTION_ORDER = [
-  { type: "instansi", label: "Instansi", collapsible: true },
-  { type: "tahun", label: "Tahun", collapsible: true },
-  { type: "umum", label: "Umum", collapsible: true },
-];
+// Label section yang sudah dikenal (`menus.type` -> teks tampilan rapi).
+// Type lain yang tidak ada di sini tetap ditampilkan, labelnya dari
+// kapitalisasi nama type-nya sendiri (lihat groupBySection).
+const SECTION_LABELS = {
+  instansi: "Instansi",
+  tahun: "Tahun",
+  umum: "Umum",
+};
 
 async function loadMenus() {
   const { data: menus, error } = await supabase
@@ -75,27 +74,26 @@ function buildSearchBox() {
   return wrap;
 }
 
+// `menus` yang masuk ke sini sudah terurut ascending by sort_order (dari
+// query di loadMenus). Urutan SECTION (dropdown mana duluan) ditentukan
+// dari sort_order TERKECIL di tiap grup type — bukan daftar tetap — jadi
+// menu dengan urutan kecil (mis. "PANDUAN" di-set 0) otomatis muncul
+// paling atas, apa pun nama type-nya.
 function groupBySection(menus) {
   const byType = new Map();
   for (const menu of menus) {
     const key = menu.type || "lainnya";
-    if (!byType.has(key)) byType.set(key, []);
-    byType.get(key).push(menu);
+    if (!byType.has(key)) byType.set(key, { minSort: menu.sort_order, items: [] });
+    byType.get(key).items.push(menu);
   }
 
-  const result = [];
-  for (const { type, label, collapsible } of SECTION_ORDER) {
-    if (byType.has(type)) {
-      result.push({ label, items: byType.get(type), collapsible });
-      byType.delete(type);
-    }
-  }
-  // Sisa type yang tidak terdaftar di SECTION_ORDER, tampilkan juga
-  // (default: dropdown, karena bisa jadi berisi banyak opsi juga)
-  for (const [type, items] of byType) {
-    result.push({ label: type.charAt(0).toUpperCase() + type.slice(1), items, collapsible: true });
-  }
-  return result;
+  return Array.from(byType.entries())
+    .sort((a, b) => a[1].minSort - b[1].minSort)
+    .map(([type, { items }]) => ({
+      label: SECTION_LABELS[type] || (type.charAt(0).toUpperCase() + type.slice(1)),
+      items,
+      collapsible: true,
+    }));
 }
 
 function buildSection(label, items, collapsible) {

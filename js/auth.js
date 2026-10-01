@@ -345,9 +345,16 @@ function buildAddressRow(item) {
   const right = document.createElement("span");
   right.className = "row-right";
 
+  // Kalau admin sudah tempel link Google Maps asli (kolom description),
+  // pakai itu — lebih akurat daripada menebak dari teks alamat. Kalau
+  // belum ada, baru fallback ke pencarian otomatis dari teks alamatnya.
+  const mapsHref = item.description && item.description.trim()
+    ? item.description.trim()
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.phone)}`;
+
   const mapsLink = document.createElement("a");
   mapsLink.className = "contact-phone";
-  mapsLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.phone)}`;
+  mapsLink.href = mapsHref;
   mapsLink.target = "_blank";
   mapsLink.rel = "noopener noreferrer";
   mapsLink.title = "Buka di Google Maps";

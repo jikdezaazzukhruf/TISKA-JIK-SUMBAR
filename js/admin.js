@@ -232,14 +232,26 @@ async function loadMenus() {
 function renderMenusTable() {
   const tbody = document.querySelector("#menus-table tbody");
   tbody.innerHTML = "";
+
+  // state.menus sudah terurut by sort_order (global) dari list_menus.
+  // Kolom "Urutan" di sini DITAMPILKAN sebagai posisi di dalam dropdown-nya
+  // sendiri (mulai dari 1 lagi tiap ganti tipe) — bukan angka sort_order
+  // mentah — supaya cocok dengan nomor dropdown yang terlihat di situs
+  // utama. sort_order asli tetap yang dipakai untuk urutan sebenarnya
+  // (dan yang diedit lewat form Edit), ini murni soal tampilan angkanya.
+  const posWithinType = new Map(); // type -> counter berjalan
   state.menus.forEach((m) => {
+    const key = m.type || "";
+    const next = (posWithinType.get(key) || 0) + 1;
+    posWithinType.set(key, next);
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${escapeHtml(m.name)}</td>
       <td>${escapeHtml(m.type || "")}</td>
       <td>${contentTypeLabel(m.content_type)}</td>
       <td>${m.status === "active" ? "Aktif" : "Nonaktif"}</td>
-      <td>${m.sort_order}</td>
+      <td>${next}</td>
     `;
     const actionsTd = document.createElement("td");
     actionsTd.appendChild(buildRowButton("Edit", () => editMenu(m)));
@@ -364,7 +376,10 @@ function contactFieldsSpec(contentType) {
     { key: "position", label: isAddress ? "Label (mis. Kantor Pusat) (opsional)" : "Jabatan (opsional)" },
     { key: "phone", label: isAddress ? "Alamat lengkap" : "No. HP/WA",
       required: true, placeholder: isAddress ? "Jl. Contoh No. 1, Kota, Provinsi" : "0812xxxxxxx" },
-    { key: "description", label: "Catatan (opsional)" },
+    { key: "description", label: isAddress
+        ? "Link Google Maps (opsional — tempel dari tombol Share di Google Maps)"
+        : "Catatan (opsional)",
+      placeholder: isAddress ? "https://maps.app.goo.gl/..." : undefined },
     { key: "status", label: "Status", type: "select", options: STATUS_OPTIONS },
     { key: "sort_order", label: "Urutan (angka)", type: "number" },
   ];
