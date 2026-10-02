@@ -483,7 +483,8 @@ function profileFieldsSpec(isNew) {
     { key: "username", label: "Username", required: true },
     { key: "role", label: "Role", type: "select", options: [
       { value: "engineer", label: "Engineer" },
-      { value: "admin", label: "Admin" },
+      { value: "pusat", label: "Pusat (akses semua menu, tanpa akses admin.html)" },
+      { value: "admin", label: "Admin (akses penuh termasuk admin.html)" },
     ] },
     { key: "status", label: "Status", type: "select", options: STATUS_OPTIONS },
     { key: "new_password", label: isNew ? "Password" : "Ganti password (kosongkan jika tidak diganti)", type: "password", required: !!isNew },
